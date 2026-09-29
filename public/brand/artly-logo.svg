@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" role="img" aria-label="Artly">
+  <rect width="64" height="64" rx="14" fill="#F5D22C"/>
+  <path
+    fill="#111111"
+    d="M32 12 12 52h8.4l3.3-6.8h16.6l3.3 6.8H52L32 12Zm0 12.4 6.1 12.6H25.9L32 24.4Z"
+  />
+  <rect x="18" y="54.2" width="28" height="3.2" rx="1.6" fill="#111111"/>
+  <text
+    x="80"
+    y="46"
+    fill="#111111"
+    font-family="Inter, 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif"
+    font-size="36"
+    font-weight="800"
+    letter-spacing="-1.2"
+  >Artly</text>
+</svg>
