@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Pencil, UserRound } from "lucide-react";
+import { CircleHelp, LogOut, Pencil, Shield, Smartphone, UserRound } from "lucide-react";
 
 import { useAuthDialog } from "@/components/auth-dialog";
 import { ProfileEditor } from "@/components/profile-editor";
@@ -38,6 +38,9 @@ export function AccountMenu() {
   if (!isAuthenticated || !currentUser) {
     return (
       <div className="flex items-center gap-1.5">
+        <Button nativeButton={false} variant="ghost" size="sm" render={<Link href="/install" />}>
+          アプリ
+        </Button>
         <Button variant="ghost" size="sm" onClick={() => openAuthDialog("login")}>
           ログイン
         </Button>
@@ -78,6 +81,33 @@ export function AccountMenu() {
           >
             <UserRound className="size-4" />
             マイプロフィール
+          </Link>
+          <Link
+            href="/install"
+            role="menuitem"
+            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm hover:bg-muted"
+            onClick={() => setOpen(false)}
+          >
+            <Smartphone className="size-4" />
+            スマホアプリ
+          </Link>
+          <Link
+            href="/privacy"
+            role="menuitem"
+            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm hover:bg-muted"
+            onClick={() => setOpen(false)}
+          >
+            <Shield className="size-4" />
+            プライバシー
+          </Link>
+          <Link
+            href="/support"
+            role="menuitem"
+            className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm hover:bg-muted"
+            onClick={() => setOpen(false)}
+          >
+            <CircleHelp className="size-4" />
+            サポート
           </Link>
           <button
             type="button"

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_JP } from "next/font/google";
 
 import { AppShell } from "@/components/app-shell";
@@ -25,6 +25,21 @@ export const metadata: Metadata = {
   description:
     "好きな音楽・本・映画をコレクションし、フォローした人の棚をフィードで共有する Artly。",
   applicationName: "Artly",
+  appleWebApp: {
+    capable: true,
+    title: "Artly",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F5D22C",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

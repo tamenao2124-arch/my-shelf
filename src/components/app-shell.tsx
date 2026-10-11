@@ -5,6 +5,9 @@ import type { ReactNode } from "react";
 import { AuthDialogProvider } from "@/components/auth-dialog";
 import { BottomNav } from "@/components/bottom-nav";
 import { GraphicBackdrop } from "@/components/graphic-backdrop";
+import { InstallAppBanner } from "@/components/install-app-banner";
+import { NativeShell } from "@/components/native-shell";
+import { PwaRegister } from "@/components/pwa-register";
 import { SiteHeader } from "@/components/site-header";
 import { SocialProvider, useSocial } from "@/components/social-provider";
 
@@ -17,7 +20,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SiteHeader />
           <HydrateBanner />
           <ReadyGate>{children}</ReadyGate>
+          <InstallAppBanner />
           <BottomNav />
+          <PwaRegister />
+          <NativeShell />
         </div>
       </AuthDialogProvider>
     </SocialProvider>
