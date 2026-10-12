@@ -34,8 +34,17 @@ yarn-error.log*
 .env*
 !.env.example
 
-# vercel
-.vercel
+# Capacitor / Xcode
+/ios/App/Pods
+/ios/App/App/public
+/ios/App/public
+/ios/DerivedData
+/ios/App/App.xcworkspace/xcuserdata
+/ios/App/App.xcodeproj/xcuserdata
+/android/.gradle
+/android/app/build
+/android/build
+*.xcuserstate
 
 # typescript
 *.tsbuildinfo

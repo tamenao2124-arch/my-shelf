@@ -98,59 +98,34 @@ SPOTIFY_CLIENT_SECRET=
 
 ## GitHub に保存する
 
-コードの保存先は [github.com/tamenao2124-arch/my-shelf](https://github.com/tamenao2124-arch/my-shelf) です。クラウドのエージェントは GitHub にログインできないので、**Cursor の GitHub 連携**と、手元（WSL）からの初回 push が必要です。`.env.local` は git 対象外です。キーはコミットしないでください。
+保存先は [github.com/tamenao2124-arch/my-shelf](https://github.com/tamenao2124-arch/my-shelf) です。`.env.local` は git 対象外です。キーはコミットしないでください。
 
-### 1. Cursor と GitHub を繋ぐ
-
-1. ブラウザで [cursor.com/dashboard](https://cursor.com/dashboard) を開く
-2. **Integrations** で GitHub の **Connect** を押す
-3. GitHub アカウント `tamenao2124-arch` で認可する
-4. リポジトリは **All repositories**、または `my-shelf` だけを選ぶ
-
-これ以降、GitHub 上の `my-shelf` を指定したクラウドエージェントは、そのリポジトリへ直接 push できます。いまのアートリーの履歴はまだ GitHub 側に無いので、次の初回 push を一度やってください。
-
-### 2. WSL から初回 push（推奨）
-
-Git と GitHub CLI を入れ、GitHub にログインします。
+手元の Ubuntu（WSL）では `~/artly` が GitHub の `my-shelf` に繋がっています。`gh auth login` 済みなら、以降の保存は次だけです。
 
 ```bash
-sudo apt update
-sudo apt install -y git gh
-gh auth login
-```
-
-`gh auth login` では GitHub.com → HTTPS → ブラウザログインを選びます。終わったら、Cursor Origin にあるアートリーをクローンして GitHub へ載せます。
-
-```bash
-git clone https://origin.cursor.com/git/tamenao2124/my-shelf.git artly
-cd artly
-git remote add github https://github.com/tamenao2124-arch/my-shelf.git
-git push -u github main
-```
-
-Origin の clone で認証を求められたら、Cursor にログインした状態で再実行するか、エージェント画面の **Codebase** から手元へ取得してください。GitHub が空のうちは `git pull` は不要で、`git push -u github main` だけで載ります。
-
-以降の更新は同じフォルダで:
-
-```bash
+cd ~/artly
 git add -A
 git commit -m "変更内容"
-git push github main
+git push origin main
 ```
 
-HTTPS のパスワードには、GitHub のパスワードではなく [Personal Access Token](https://github.com/settings/tokens)（`repo` 権限）を使います。`gh auth login` 済みならトークン入力は不要です。
+GitHub のページに `package.json` と `src` フォルダが見えたら、アートリー本体は載っています。見えないときは、エージェントが渡した取り込み用コマンドを Ubuntu で実行してください。
 
-### 3. 手元クローンだけ使う場合
+Cursor ダッシュボードの **Integrations** で GitHub を Connect しておくと、あとからクラウドエージェントも同じリポジトリへ直接 push できます。
 
-GitHub に載ったあと:
+## App Store に出す
 
-```bash
-gh repo clone tamenao2124-arch/my-shelf
-cd my-shelf
-cp .env.example .env.local   # キーはここに書く
-npm install
-npm run dev
-```
+iPhone の App Store に並べる準備（バンドルID `com.tamenao.artly`、1024px アイコン、プライバシー `/privacy`、サポート `/support`）は入っています。提出そのものは **Apple Developer Program（年額 99 ドル）** と **Mac の Xcode** が必要です。
+
+1. この画面の **Publish** で https の公開URLを出す
+2. `src/native/live-url.ts` にそのURLを書く
+3. Mac で `npm install` → `npx cap add ios` → `npx cap sync` → `npx cap open ios`
+4. Xcode で Team を選び、Archive して App Store Connect に上げる
+5. プライバシーポリシーURLに `https://公開ドメイン/privacy`、サポートに `/support` を貼って審査提出する
+
+詳しい手順はサイトの `/install` にあります。
+
+ホーム画面だけの追加（審査なし）も同じ `/install` の下に書いてあります。
 
 ## 起動方法
 
