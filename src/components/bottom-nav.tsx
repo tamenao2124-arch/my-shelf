@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, House, Newspaper, UserRound } from "lucide-react";
+import { Compass, GalleryVerticalEnd, Newspaper, UserRound } from "lucide-react";
 
 import { useAuthDialog } from "@/components/auth-dialog";
 import { useSocial } from "@/components/social-provider";
@@ -15,7 +15,7 @@ export function BottomNav() {
   const profileHref = isAuthenticated && currentUser ? `/users/${currentUser.id}` : "/login";
 
   const items = [
-    { href: "/", label: "マイ棚", icon: House, match: (path: string) => path === "/" },
+    { href: "/", label: "タイムライン", icon: GalleryVerticalEnd, match: (path: string) => path === "/" },
     {
       href: "/feed",
       label: "フィード",
@@ -48,7 +48,7 @@ export function BottomNav() {
         {items.map((item) => {
           const active = item.match(pathname);
           const className = cn(
-            "flex w-full flex-col items-center gap-0.5 rounded-lg px-1 py-1.5 text-[11px] font-semibold",
+            "flex w-full flex-col items-center gap-0.5 rounded-lg px-0.5 py-1.5 text-[10px] leading-tight font-semibold sm:text-[11px]",
             active ? "text-foreground" : "text-muted-foreground",
           );
           const inner = (

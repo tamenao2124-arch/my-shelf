@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · Artly",
   },
   description:
-    "好きな音楽・本・映画をコレクションし、フォローした人の棚をフィードで共有する Artly。",
+    "好きな音楽・本・映画をコレクションし、みんなの更新をタイムラインで見る Artly。",
   applicationName: "Artly",
   appleWebApp: {
     capable: true,

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, House, Newspaper } from "lucide-react";
+import { Compass, GalleryVerticalEnd, Newspaper } from "lucide-react";
 
 import { AccountMenu } from "@/components/account-menu";
 import { BrandMark } from "@/components/brand-mark";
@@ -11,7 +11,7 @@ import { PersistenceNote } from "@/components/persistence-note";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "マイ棚", icon: House },
+  { href: "/", label: "タイムライン", icon: GalleryVerticalEnd },
   { href: "/feed", label: "フィード", icon: Newspaper },
   { href: "/explore", label: "さがす", icon: Compass },
 ] as const;

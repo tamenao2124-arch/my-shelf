@@ -90,6 +90,39 @@ function seedSnapshot(): SocialSnapshot {
   };
 }
 
+function mergeCommunitySeeds(snapshot: SocialSnapshot): SocialSnapshot {
+  const userIds = new Set(snapshot.users.map((user) => user.id));
+  const users = [
+    ...snapshot.users,
+    ...USERS.filter((user) => !userIds.has(user.id)).map((user) => structuredClone(user)),
+  ];
+
+  const shelves = { ...snapshot.shelves };
+  for (const [userId, items] of Object.entries(INITIAL_SHELVES)) {
+    if (!shelves[userId]?.length) {
+      shelves[userId] = structuredClone(items);
+    }
+  }
+
+  const postIds = new Set(snapshot.posts.map((post) => post.id));
+  const posts = [
+    ...snapshot.posts,
+    ...INITIAL_POSTS.filter((post) => !postIds.has(post.id)).map((post) => structuredClone(post)),
+  ];
+
+  const likes = { ...snapshot.likes };
+  for (const [postId, userIdsForPost] of Object.entries(INITIAL_LIKES)) {
+    if (!likes[postId]?.length) likes[postId] = [...userIdsForPost];
+  }
+
+  const comments = { ...snapshot.comments };
+  for (const [postId, thread] of Object.entries(INITIAL_COMMENTS)) {
+    if (!comments[postId]?.length) comments[postId] = structuredClone(thread);
+  }
+
+  return { ...snapshot, users, shelves, posts, likes, comments };
+}
+
 async function seedDocument(): Promise<LocalDocument> {
   const salt = DEMO_USER_ID;
   return {
@@ -133,13 +166,15 @@ function enqueueWrite(task: () => Promise<void>) {
 export async function loadLocalDocument(): Promise<LocalDocument> {
   const existing = readRaw();
   if (existing) {
-    existing.snapshot = hydrateSnapshot({
-      ...existing.snapshot,
-      users: existing.snapshot.users.map((user) => ({
-        ...user,
-        avatarUrl: user.avatarUrl ?? null,
-      })),
-    });
+    existing.snapshot = hydrateSnapshot(
+      mergeCommunitySeeds({
+        ...existing.snapshot,
+        users: existing.snapshot.users.map((user) => ({
+          ...user,
+          avatarUrl: user.avatarUrl ?? null,
+        })),
+      }),
+    );
     return existing;
   }
   const seeded = await seedDocument();

@@ -292,6 +292,18 @@ export const INITIAL_SHELVES: Record<string, ShelfItem[]> = {
 
 export const INITIAL_POSTS: FeedPost[] = [
   {
+    id: "p-ken-hehn",
+    userId: "ken",
+    item: kenShelf[1],
+    createdAt: hoursAgo(0.6),
+  },
+  {
+    id: "p-hana-yoasobi",
+    userId: "hana",
+    item: hanaShelf[0],
+    createdAt: hoursAgo(1.1),
+  },
+  {
     id: "p-aoi-1",
     userId: "aoi",
     item: aoiShelf[0],
@@ -342,6 +354,8 @@ export const INITIAL_POSTS: FeedPost[] = [
 ];
 
 export const INITIAL_LIKES: Record<string, string[]> = {
+  "p-ken-hehn": ["aoi", "hana"],
+  "p-hana-yoasobi": ["misaki"],
   "p-aoi-1": ["ta", "ken", "hana"],
   "p-misaki-1": ["ta", "hana"],
   "p-riku-1": ["aoi", "ta"],

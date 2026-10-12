@@ -53,6 +53,7 @@ import {
 } from "@/lib/supabase";
 import {
   followersOf,
+  publicTimelinePosts,
   type FeedPost,
   type PostComment,
   type UserProfile,
@@ -87,6 +88,7 @@ type SocialContextValue = {
   likedByMe: (postId: string) => boolean;
   addComment: (postId: string, text: string) => Promise<void>;
   feedPosts: FeedPost[];
+  timelinePosts: FeedPost[];
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (input: SignUpInput) => Promise<void>;
   signOut: () => Promise<void>;
@@ -426,18 +428,19 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     [mode, requireUserId]
   );
 
+  const timelinePosts = useMemo(
+    () => publicTimelinePosts(snapshot.posts, snapshot.shelves),
+    [snapshot.posts, snapshot.shelves]
+  );
+
   const feedPosts = useMemo(() => {
-    const visible = currentUserId
-      ? new Set([currentUserId, ...(snapshot.following[currentUserId] ?? [])])
-      : null;
-    return snapshot.posts
-      .filter((post) => (visible ? visible.has(post.userId) : true))
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }, [currentUserId, snapshot.following, snapshot.posts]);
+    if (!currentUserId) return [];
+    const visible = new Set([
+      currentUserId,
+      ...(snapshot.following[currentUserId] ?? []),
+    ]);
+    return timelinePosts.filter((post) => visible.has(post.userId));
+  }, [currentUserId, snapshot.following, timelinePosts]);
 
   const value = useMemo<SocialContextValue>(
     () => ({
@@ -468,6 +471,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       likedByMe,
       addComment,
       feedPosts,
+      timelinePosts,
       signIn,
       signUp,
       signOut,
@@ -480,6 +484,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       currentUser,
       currentUserId,
       feedPosts,
+      timelinePosts,
       follow,
       followerIds,
       followingIds,

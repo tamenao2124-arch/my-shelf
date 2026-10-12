@@ -33,6 +33,32 @@ export function hoursAgo(hours: number) {
   return new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
 }
 
+export function publicTimelinePosts(
+  posts: FeedPost[],
+  shelves: Record<string, ShelfItem[]>,
+): FeedPost[] {
+  const seenItems = new Set(posts.map((post) => post.item.id));
+  const seenIds = new Set(posts.map((post) => post.id));
+  const derived: FeedPost[] = [];
+
+  for (const [userId, items] of Object.entries(shelves)) {
+    for (const item of items) {
+      const id = `p-${item.id}`;
+      if (seenItems.has(item.id) || seenIds.has(id)) continue;
+      derived.push({
+        id,
+        userId,
+        item,
+        createdAt: item.addedAt || item.experiencedAt || hoursAgo(72),
+      });
+    }
+  }
+
+  return [...posts, ...derived].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
 export function formatRelativeTime(iso: string) {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.max(0, Math.round(diffMs / 60000));

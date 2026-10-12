@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Artly",
     short_name: "Artly",
     description:
-      "好きな音楽・本・映画をコレクションし、フォローした人の棚をフィードで共有する Artly。",
+      "好きな音楽・本・映画をコレクションし、みんなの更新をタイムラインで見る Artly。",
     lang: "ja",
     dir: "ltr",
     start_url: "/",
@@ -39,8 +39,8 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       {
-        name: "マイ棚",
-        short_name: "マイ棚",
+        name: "タイムライン",
+        short_name: "タイムライン",
         url: "/",
         icons: [{ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
       },

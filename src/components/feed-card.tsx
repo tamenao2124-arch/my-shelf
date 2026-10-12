@@ -10,6 +10,7 @@ import { SparkleBurst } from "@/components/sparkle-burst";
 import { TagPills } from "@/components/tag-pills";
 import { UserAvatar } from "@/components/user-avatar";
 import { useAuthDialog } from "@/components/auth-dialog";
+import { FollowButton } from "@/components/follow-button";
 import { useSocial } from "@/components/social-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,13 @@ import { formatRelativeTime, type FeedPost } from "@/lib/social";
 import { MEDIA_EMOJI, MEDIA_LABEL, mediaCreator } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function FeedCard({ post }: { post: FeedPost }) {
+export function FeedCard({
+  post,
+  discover = false,
+}: {
+  post: FeedPost;
+  discover?: boolean;
+}) {
   const {
     userById,
     likes,
@@ -27,6 +34,8 @@ export function FeedCard({ post }: { post: FeedPost }) {
     likedByMe,
     addComment,
     isAuthenticated,
+    currentUserId,
+    isFollowing,
   } = useSocial();
   const { openAuthDialog } = useAuthDialog();
   const author = userById(post.userId);
@@ -38,6 +47,9 @@ export function FeedCard({ post }: { post: FeedPost }) {
   const liked = likedByMe(post.id);
 
   if (!author) return null;
+
+  const stranger =
+    discover && author.id !== currentUserId && !isFollowing(author.id);
 
   function submitComment() {
     addComment(post.id, draft);
@@ -51,7 +63,7 @@ export function FeedCard({ post }: { post: FeedPost }) {
 
   return (
     <article className="rounded-lg border border-foreground/10 bg-white p-4 poster-card sm:p-5">
-      <header className="flex items-center gap-3">
+      <header className="flex items-start justify-between gap-3">
         <Link href={`/users/${author.id}`} className="flex min-w-0 items-center gap-3">
           <UserAvatar
             name={author.name}
@@ -62,9 +74,11 @@ export function FeedCard({ post }: { post: FeedPost }) {
             <span className="block truncate font-medium">{author.name}</span>
             <span className="block text-xs text-muted-foreground">
               @{author.handle} · {formatRelativeTime(post.createdAt)}
+              {stranger ? " · 未フォロー" : ""}
             </span>
           </span>
         </Link>
+        {stranger ? <FollowButton userId={author.id} compact /> : null}
       </header>
       <p className="mt-3 text-sm text-muted-foreground">
         棚に{MEDIA_LABEL[post.item.type]}を追加しました

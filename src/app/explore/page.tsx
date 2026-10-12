@@ -30,7 +30,7 @@ export default function ExplorePage() {
         </p>
         <h1 className="font-heading mt-1 text-4xl">探す</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          ユーザーを探してフォローすると、その人の棚がフィードに届きます。
+          ユーザーを探してフォローすると、その人の棚がフィードに届きます。みんなの更新はタイムラインでも流れます。
         </p>
       </header>
       <label className="relative mb-6">
