@@ -166,7 +166,7 @@ function ItemDetailBody({
                 onClick={() => void remove()}
                 disabled={pending}
               >
-                {pending ? "外しています…" : "本当に外す"}
+                {pending ? "外しています…" : "はい"}
               </Button>
             </>
           ) : (
