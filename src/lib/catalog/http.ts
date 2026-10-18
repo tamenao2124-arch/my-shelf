@@ -37,6 +37,24 @@ export async function fetchJsonOrNull<T>(
   }
 }
 
+export async function fetchText(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "text/html,application/xhtml+xml",
+        "User-Agent": CATALOG_UA,
+      },
+      signal: timeoutSignal(),
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    return await response.text();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 export function yearFromDate(value?: string | number | null): number | undefined {
   if (value == null || value === "") return undefined;
   const match = String(value).match(/(18|19|20)\d{2}/);
