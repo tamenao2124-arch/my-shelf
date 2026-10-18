@@ -8,6 +8,8 @@ export type SearchSource =
   | "google-books"
   | "tmdb"
   | "anilist"
+  | "wikidata"
+  | "eiga"
   | "local";
 
 type ShelfItemBase = {
@@ -89,6 +91,8 @@ export const SOURCE_LABEL: Record<SearchSource, string> = {
   "google-books": "Google Books",
   tmdb: "TMDB",
   anilist: "AniList",
+  wikidata: "Wikidata",
+  eiga: "映画.com",
   local: "カタログ",
 };
 
