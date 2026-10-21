@@ -1,6 +1,6 @@
 import type { MediaType, SearchHit } from "@/lib/types";
 
-export type CatalogServiceId = "netflix" | "prime" | "unext" | "kindle";
+export type CatalogServiceId = "netflix" | "prime" | "unext" | "kindle" | "theaters";
 
 export type CatalogService = {
   id: CatalogServiceId;
@@ -35,6 +35,14 @@ export const CATALOG_SERVICES: CatalogService[] = [
     tmdbProviderIds: [84],
     wikiHint: "U-NEXT",
     experienceMethod: "unext",
+  },
+  {
+    id: "theaters",
+    label: "公開中",
+    media: "movie",
+    tmdbProviderIds: [],
+    wikiHint: "公開中",
+    experienceMethod: "theater",
   },
   {
     id: "kindle",
@@ -89,6 +97,7 @@ export function experienceMethodFromHit(hit: SearchHit) {
     return "kindle";
   }
   const providers = hit.providers ?? [];
+  if (hit.type === "movie" && providers.includes("映画館")) return "theater";
   for (const service of CATALOG_SERVICES) {
     if (service.media !== hit.type) continue;
     if (providers.includes(service.label)) return service.experienceMethod;
