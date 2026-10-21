@@ -8,7 +8,7 @@ import { ItemCard } from "@/components/item-card";
 import { ItemDetailDialog } from "@/components/item-detail-dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PRESET_TAGS, addedTimestamp, normalizeTags } from "@/lib/review";
+import { addedTimestamp } from "@/lib/review";
 import {
   MEDIA_EMOJI,
   MEDIA_LABEL,
@@ -61,7 +61,6 @@ export function ShelfGrid({
   const [tab, setTab] = useState<TabValue>("all");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortValue>("added-desc");
-  const [tag, setTag] = useState("all");
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const counts = useMemo(
@@ -79,7 +78,6 @@ export function ShelfGrid({
     const filtered = items.filter((item) => {
       const matchesType = tab === "all" || item.type === tab;
       if (!matchesType) return false;
-      if (tag !== "all" && !normalizeTags(item.tags).includes(tag as (typeof PRESET_TAGS)[number])) return false;
       if (!normalized) return true;
       return searchableText(item).toLowerCase().includes(normalized);
     });
@@ -91,7 +89,7 @@ export function ShelfGrid({
       const delta = addedTimestamp(a) - addedTimestamp(b);
       return sort === "added-asc" ? delta : -delta;
     });
-  }, [items, query, sort, tab, tag]);
+  }, [items, query, sort, tab]);
 
   const activeItem = items.find((item) => item.id === activeId) ?? null;
 
@@ -161,20 +159,8 @@ export function ShelfGrid({
         </label>
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
-          <TagChip
-            label="すべて"
-            active={tag === "all"}
-            onClick={() => setTag("all")}
-          />
-          {PRESET_TAGS.map((entry) => (
-            <TagChip
-              key={entry}
-              label={entry}
-              active={tag === entry}
-              onClick={() => setTag(entry)}
-            />
-          ))}
-        </div>
+        <TagChip label="すべて" active onClick={() => undefined} />
+      </div>
       {visibleItems.length > 0 ? (
         <ul className="mt-5 grid grid-cols-3 gap-1 sm:mt-6 sm:grid-cols-3 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-4">
           {visibleItems.map((item) => (
@@ -186,20 +172,19 @@ export function ShelfGrid({
       ) : (
         <div className="mt-10 flex flex-col items-center rounded-lg border border-dashed border-foreground/20 bg-white px-6 py-16 text-center">
           <p className="font-heading text-2xl">
-            {query || tag !== "all"
+            {query
               ? "条件に合う作品はありません"
               : tab === "all"
                 ? "棚はまだ空です"
                 : `${MEDIA_LABEL[tab]}の棚は空です`}
           </p>
-          {query || tab !== "all" || tag !== "all" ? (
+          {query || tab !== "all" ? (
             <Button
               variant="outline"
               className="mt-5"
               onClick={() => {
                 setQuery("");
                 setTab("all");
-                setTag("all");
               }}
             >
               条件をリセット
