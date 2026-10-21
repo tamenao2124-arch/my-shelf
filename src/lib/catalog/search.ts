@@ -5,6 +5,10 @@ import { catalogProviderStatus } from "@/lib/catalog/env";
 import { searchGoogleBooks } from "@/lib/catalog/google-books";
 import { searchItunesEbooks, searchItunesMusic } from "@/lib/catalog/itunes";
 import { movieOriginFilter, searchLocalCatalog } from "@/lib/catalog/local";
+import {
+  isNowShowingQuery,
+  searchNowShowing,
+} from "@/lib/catalog/now-showing";
 import { searchOpenLibrary } from "@/lib/catalog/open-library";
 import {
   catalogService,
@@ -80,6 +84,7 @@ function rankHits(
   const q = normalizeCatalogText(query);
   const selected = catalogService(service);
   const sourceWeight: Partial<Record<SearchHit["source"], number>> = {
+    eiga: -6,
     tmdb: -4,
     local: -5,
     spotify: -3,
@@ -127,11 +132,16 @@ function warningsFor(
   const configured = catalogProviderStatus();
   const selected = catalogService(service);
   const warnings: string[] = [];
-  if (type === "movie" && !configured.tmdb) {
+  if (type === "movie" && !configured.tmdb && selected?.id !== "theaters") {
     warnings.push(
       selected
         ? `${selected.label} の配信カタログは TMDB キーがあるとより多く出ます。いまは内蔵カタログ、AniList、Wikipedia でも探しています。`
         : "TMDB キーがあるとポスターと配信情報が安定します。いまは内蔵の邦画・洋画カタログ、AniList、Wikipedia でも探しています。"
+    );
+  }
+  if (type === "movie" && selected?.id === "theaters" && hits.length === 0) {
+    warnings.push(
+      "公開中の一覧を取得できませんでした。作品名で検索するか、時間をおいて再度お試しください。"
     );
   }
   if (type === "book" && !configured.googleBooks) {
@@ -171,27 +181,36 @@ async function searchBooks(query: string, service?: CatalogServiceId) {
 
 async function searchMovies(query: string, service?: CatalogServiceId) {
   const origin = movieOriginFilter(query);
+  const nowShowing = service === "theaters" || isNowShowingQuery(query);
+  const titleQuery = Boolean(query.trim()) && !isNowShowingQuery(query) && !origin;
   const jobs: Array<Promise<SearchHit[]>> = [searchLocalCatalog(query, "movie", service)];
   const sources: SearchSource[] = ["local"];
-  if (origin) return { jobs, sources };
 
-  if (hasTmdbCredentials()) {
+  if (nowShowing) {
+    jobs.push(searchNowShowing(query).catch(() => [] as SearchHit[]));
+    sources.push("eiga");
+  }
+
+  if (hasTmdbCredentials() && (!nowShowing || titleQuery)) {
     jobs.push(
-      searchTmdbMovies(query, { service, browse: !query.trim() && Boolean(service) }).catch(
-        () => [] as SearchHit[]
-      )
+      searchTmdbMovies(query, {
+        service: service === "theaters" ? undefined : service,
+        browse: !query.trim() && Boolean(service) && service !== "theaters",
+      }).catch(() => [] as SearchHit[])
     );
     sources.push("tmdb");
   }
-  if (query.trim()) {
+
+  if (titleQuery) {
     jobs.push(searchAniListMovies(query).catch(() => [] as SearchHit[]));
     sources.push("anilist");
-    if (!/[\u3040-\u30ff\u4e00-\u9fff]/.test(query)) {
-      jobs.push(searchWikipediaMoviesEn(query).catch(() => [] as SearchHit[]));
-    }
+    jobs.push(searchWikipediaMoviesEn(query).catch(() => [] as SearchHit[]));
+    sources.push("wikipedia");
   }
-  jobs.push(searchWikipediaMovies(query, service).catch(() => [] as SearchHit[]));
-  sources.push("wikipedia");
+  if (!origin && !isNowShowingQuery(query) && !(service === "theaters" && !query.trim())) {
+    jobs.push(searchWikipediaMovies(query, service).catch(() => [] as SearchHit[]));
+    sources.push("wikipedia");
+  }
   return { jobs, sources };
 }
 
@@ -237,6 +256,8 @@ export async function searchCatalog(
         : await searchMovies(q, service);
 
   const originQuery = type === "movie" ? movieOriginFilter(q) : null;
+  const nowShowingBrowse =
+    type === "movie" && (service === "theaters" || isNowShowingQuery(q));
   const settled = await Promise.allSettled(bundle.jobs);
   let merged = rankHits(dedupeHits(settled.flatMap(settledHits)), q, service)
     .filter((hit) => hit.type === type)
@@ -244,10 +265,12 @@ export async function searchCatalog(
       0,
       type === "movie"
         ? originQuery === "west"
-          ? 120
+          ? 160
           : originQuery
-            ? 48
-            : 36
+            ? 120
+            : nowShowingBrowse
+              ? 80
+              : 60
         : 24
     );
 
