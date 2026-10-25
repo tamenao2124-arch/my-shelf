@@ -88,6 +88,13 @@ export function ExploreScreen() {
   }, [query]);
 
   useEffect(() => {
+    return () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.blur();
+    };
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     async function loadBrowse() {
       setBrowseLoading(true);
@@ -172,7 +179,7 @@ export function ExploreScreen() {
 
   return (
     <div className="bg-[#fffdf5] md:bg-transparent">
-      <div className="sticky top-0 z-30 bg-[#fffdf5] px-4 pt-3 pb-3 md:static md:px-0 md:pt-0">
+      <div className="bg-[#fffdf5] px-4 pt-3 pb-3 md:px-0 md:pt-0">
         <label className="relative block">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <ImeTextInput
@@ -180,7 +187,9 @@ export function ExploreScreen() {
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
             placeholder="タイトル、人、感想で検索"
-            className="h-11 rounded-lg border-2 border-foreground/10 bg-white pl-9 text-sm shadow-none"
+            className="h-11 rounded-lg border-2 border-foreground/10 bg-white pl-9 text-base shadow-none md:text-sm"
+            inputMode="search"
+            enterKeyHint="search"
             aria-label="作品・ユーザーを検索"
             autoComplete="off"
             autoCorrect="off"
