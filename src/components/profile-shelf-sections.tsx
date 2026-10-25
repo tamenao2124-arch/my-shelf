@@ -47,7 +47,7 @@ export function ProfileShelfSections({
   return (
     <div className="space-y-7 pb-4">
       {showAdd && onAdd ? (
-        <div className="flex justify-end">
+        <div className="hidden justify-end md:flex">
           <AddItemDialog onAdd={onAdd} existingItems={items} />
         </div>
       ) : null}
