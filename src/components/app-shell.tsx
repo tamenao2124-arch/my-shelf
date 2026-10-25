@@ -16,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <SocialProvider>
       <AuthDialogProvider>
         <GraphicBackdrop />
-        <div className="relative z-10 flex min-h-full flex-col">
+        <div className="relative z-10 flex min-h-full flex-col max-md:h-dvh max-md:min-h-0 max-md:overflow-hidden">
           <SiteHeader />
           <HydrateBanner />
           <ReadyGate>{children}</ReadyGate>
@@ -49,5 +49,9 @@ function ReadyGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  return children;
+  return (
+    <div className="flex min-h-0 flex-1 flex-col max-md:overflow-y-auto max-md:overscroll-y-contain max-md:[-webkit-overflow-scrolling:touch]">
+      {children}
+    </div>
+  );
 }
