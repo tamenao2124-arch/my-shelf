@@ -17,6 +17,13 @@ export function BottomNav() {
   const { openAuthDialog } = useAuthDialog();
   const profileHref = isAuthenticated && currentUser ? `/users/${currentUser.id}` : "/login";
 
+useEffect(() => {
+  const active = document.activeElement;
+  if (active instanceof HTMLElement) active.blur();
+}, [pathname]);
+
+const items = [
+
   const items = [
     { href: "/", label: "タイムライン", icon: GalleryVerticalEnd, match: (path: string) => path === "/" },
     {
