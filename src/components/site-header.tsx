@@ -18,9 +18,10 @@ const NAV = [
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const onUserProfile = pathname.startsWith("/users/");
+  const hideMobileChrome =
+    pathname.startsWith("/users/") || pathname.startsWith("/explore");
 
-  if (onUserProfile) {
+  if (hideMobileChrome) {
     return (
       <header className="sticky top-0 z-40 hidden border-b border-foreground/10 bg-[#f9f9fb]/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl md:block">
         <DesktopHeaderInner pathname={pathname} />
