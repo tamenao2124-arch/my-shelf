@@ -42,7 +42,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="スマホメニュー"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-foreground/10 bg-[#f9f9fb]/92 px-2 pt-1.5 pb-[max(0.55rem,env(safe-area-inset-bottom))] shadow-[0_-16px_32px_-24px_rgb(17_17_17_/_0.35)] backdrop-blur-xl md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-foreground/10 bg-[#fffdf5]/95 px-2 pt-1.5 pb-[max(0.55rem,env(safe-area-inset-bottom))] shadow-[0_-16px_32px_-24px_rgb(17_17_17_/_0.25)] backdrop-blur-xl md:hidden"
     >
       <ul className="mx-auto grid max-w-lg grid-cols-4">
         {items.map((item) => {
