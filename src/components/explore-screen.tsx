@@ -181,20 +181,23 @@ export function ExploreScreen() {
     <div className="bg-[#fffdf5] md:bg-transparent">
       <div className="bg-[#fffdf5] px-4 pt-3 pb-3 md:px-0 md:pt-0">
         <label className="relative block">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <ImeTextInput
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.currentTarget.value)}
-            placeholder="タイトル、人、感想で検索"
-            className="h-11 rounded-lg border-2 border-foreground/10 bg-white pl-9 text-base shadow-none md:text-sm"
-            inputMode="search"
-            enterKeyHint="search"
-            aria-label="作品・ユーザーを検索"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-          />
+     <ImeTextInput
+  type="text"
+  value={query}
+  onChange={(event) => setQuery(event.currentTarget.value)}
+  onFocus={(event) => {
+    event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }}
+  placeholder="タイトル、人、感想で検索"
+  className="h-11 touch-manipulation rounded-lg border-2 border-foreground/10 bg-white pl-9 text-base shadow-none md:text-sm"
+  inputMode="search"
+  enterKeyHint="search"
+  aria-label="作品・ユーザーを検索"
+  autoComplete="off"
+  autoCorrect="off"
+  spellCheck={false}
+/>     <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+     
         </label>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((entry) => {
