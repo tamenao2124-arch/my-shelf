@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${inter.variable} ${notoSansJp.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full flex flex-col">
+      <body className="relative flex min-h-full flex-col max-md:h-dvh max-md:overflow-hidden">
         <AppShell>{children}</AppShell>
       </body>
     </html>
