@@ -161,6 +161,38 @@ async function mapPool<T>(items: T[], concurrency: number, fn: (item: T) => Prom
   await Promise.all(workers);
 }
 
+type CoverableHit = {
+  type?: string;
+  title: string;
+  coverUrl: string;
+  coverHint?: string;
+};
+
+/** Fill missing jacket URLs for explore / local catalog hits (server-side). */
+export async function hydrateSearchHitCovers<T extends CoverableHit>(
+  hits: T[],
+): Promise<T[]> {
+  const movies = hits.filter((hit) => hit.type === "movie" && !hit.coverUrl);
+  if (movies.length > 0) {
+    await hydrateMovieCovers(movies);
+  }
+
+  const books = hits.filter(
+    (hit) => hit.type === "book" && !hit.coverUrl && hit.coverHint,
+  );
+  if (books.length > 0) {
+    const posters = await englishWikiPosters(
+      books.map((hit) => hit.coverHint ?? ""),
+    );
+    for (const hit of books) {
+      const url = posters.get(hit.coverHint ?? "") ?? "";
+      if (url) hit.coverUrl = url;
+    }
+  }
+
+  return hits;
+}
+
 export async function hydrateMovieCovers<T extends { title: string; coverUrl: string; coverHint?: string }>(
   hits: T[]
 ): Promise<T[]> {
