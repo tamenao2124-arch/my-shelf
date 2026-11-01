@@ -26,8 +26,8 @@ export function ExploreHitCard({
   footer?: ReactNode;
 }) {
   const [broken, setBroken] = useState(false);
-const coverSrc = displayCoverUrl(hit.coverUrl);
-const showImage = Boolean(coverSrc) && !broken;
+  const coverSrc = displayCoverUrl(hit.coverUrl);
+  const showImage = Boolean(coverSrc) && !broken;
   const creator = mediaCreator(hit);
 
   return (
@@ -45,15 +45,14 @@ const showImage = Boolean(coverSrc) && !broken;
       >
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
-<img
-  <img
-  src={coverSrc}
-  alt=""
-  className="size-full object-cover"
-  loading="lazy"
-  decoding="async"
-  onError={() => setBroken(true)}
-/>
+          <img
+            src={coverSrc}
+            alt=""
+            className="size-full object-cover"
+            loading="lazy"
+            decoding="async"
+            onError={() => setBroken(true)}
+          />
         ) : (
           <div className="flex size-full items-center justify-center text-3xl text-white/90">
             {MEDIA_EMOJI[hit.type]}
