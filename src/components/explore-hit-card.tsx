@@ -43,12 +43,15 @@ export function ExploreHitCard({
       >
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={hit.coverUrl}
-            alt=""
-            className="size-full object-cover"
-            onError={() => setBroken(true)}
-          />
+<img
+  src={hit.coverUrl}
+  alt=""
+  className="size-full object-cover"
+  loading="lazy"
+  decoding="async"
+  referrerPolicy="no-referrer"
+  onError={() => setBroken(true)}
+/>
         ) : (
           <div className="flex size-full items-center justify-center text-3xl text-white/90">
             {MEDIA_EMOJI[hit.type]}
