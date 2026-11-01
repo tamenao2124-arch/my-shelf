@@ -143,11 +143,13 @@ export function ExploreScreen() {
     async function loadBrowse() {
       setBrowseLoading(true);
       const pool = dedupeHits([
-        ...(await fetchCatalog("movie", "", "theaters")),
-        ...(await fetchCatalog("music", "サウンドトラック")),
-        ...(await fetchCatalog("book", "ベストセラー")),
-        ...localCatalogHits(),
-      ]);
+  ...(await fetchCatalog("movie", "", "theaters")),
+  ...(await fetchCatalog("movie", "洋画")),
+  ...(await fetchCatalog("movie", "邦画")),
+  ...(await fetchCatalog("music", "サウンドトラック")),
+  ...(await fetchCatalog("book", "ベストセラー")),
+  ...localCatalogHits().filter((hit) => hit.type === "book"),
+]);
       const withCovers = await hydrateCoverUrls(pool);
       if (!cancelled) {
         setBrowseHits(withCovers);
