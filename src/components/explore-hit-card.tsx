@@ -11,6 +11,7 @@ import {
   type SearchHit,
   type ShelfItem,
 } from "@/lib/types";
+import { displayCoverUrl } from "@/lib/cover-display-url";
 import { cn } from "@/lib/utils";
 
 export function ExploreHitCard({
@@ -25,7 +26,8 @@ export function ExploreHitCard({
   footer?: ReactNode;
 }) {
   const [broken, setBroken] = useState(false);
-  const showImage = Boolean(hit.coverUrl) && !broken;
+const coverSrc = displayCoverUrl(hit.coverUrl);
+const showImage = Boolean(coverSrc) && !broken;
   const creator = mediaCreator(hit);
 
   return (
@@ -44,12 +46,12 @@ export function ExploreHitCard({
         {showImage ? (
           // eslint-disable-next-line @next/next/no-img-element
 <img
-  src={hit.coverUrl}
+  <img
+  src={coverSrc}
   alt=""
   className="size-full object-cover"
   loading="lazy"
   decoding="async"
-  referrerPolicy="no-referrer"
   onError={() => setBroken(true)}
 />
         ) : (
