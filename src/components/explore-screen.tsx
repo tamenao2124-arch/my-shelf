@@ -33,16 +33,60 @@ const TABS: { value: ExploreTab; label: string }[] = [
 const SEARCH_TYPES: MediaType[] = ["music", "book", "movie"];
 
 function dedupeHits(hits: SearchHit[]) {
-  const seen = new Set<string>();
-  const out: SearchHit[] = [];
+  const byKey = new Map<string, SearchHit>();
   for (const hit of hits) {
-    const key = hit.id || identityKey(hit);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(hit);
+    const key = identityKey(hit);
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, hit);
+      continue;
+    }
+    if (!existing.coverUrl && hit.coverUrl) {
+      byKey.set(key, { ...existing, ...hit, coverUrl: hit.coverUrl });
+    }
   }
-  return out;
+  return [...byKey.values()];
 }
+
+async function hydrateCoverUrls(hits: SearchHit[]): Promise<SearchHit[]> {
+  const needsCover = hits.some((hit) => !hit.coverUrl);
+  if (!needsCover) return hits;
+
+  try {
+    const response = await fetch("/api/covers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        hits: hits.map((hit) => ({
+          id: hit.id,
+          type: hit.type,
+          title: hit.title,
+          coverUrl: hit.coverUrl,
+          coverHint: hit.coverHint,
+        })),
+      }),
+    });
+    if (!response.ok) return hits;
+    const data = (await response.json()) as { hits?: CoverRequestHit[] };
+    const hydrated = data.hits;
+    if (!hydrated?.length) return hits;
+
+    const coverById = new Map(
+      hydrated.map((row) => [row.id, row.coverUrl] as const),
+    );
+    return hits.map((hit) => {
+      const coverUrl = coverById.get(hit.id);
+      return coverUrl ? { ...hit, coverUrl } : hit;
+    });
+  } catch {
+    return hits;
+  }
+}
+
+type CoverRequestHit = Pick<
+  SearchHit,
+  "id" | "type" | "title" | "coverUrl" | "coverHint"
+>;
 
 function shelfItemToHit(item: ShelfItem): SearchHit {
   return {
@@ -99,13 +143,14 @@ export function ExploreScreen() {
     async function loadBrowse() {
       setBrowseLoading(true);
       const pool = dedupeHits([
-        ...localCatalogHits(),
         ...(await fetchCatalog("movie", "", "theaters")),
         ...(await fetchCatalog("music", "サウンドトラック")),
         ...(await fetchCatalog("book", "ベストセラー")),
+        ...localCatalogHits(),
       ]);
+      const withCovers = await hydrateCoverUrls(pool);
       if (!cancelled) {
-        setBrowseHits(pool);
+        setBrowseHits(withCovers);
         setBrowseLoading(false);
       }
     }
@@ -134,7 +179,8 @@ export function ExploreScreen() {
         tab === "all" ? undefined : tab,
       );
       if (!cancelled) {
-        setSearchHits(dedupeHits([...batches.flat(), ...fromShelves]));
+        const merged = dedupeHits([...batches.flat(), ...fromShelves]);
+        setSearchHits(await hydrateCoverUrls(merged));
         setSearchLoading(false);
       }
     }
@@ -181,23 +227,23 @@ export function ExploreScreen() {
     <div className="bg-[#fffdf5] md:bg-transparent">
       <div className="bg-[#fffdf5] px-4 pt-3 pb-3 md:px-0 md:pt-0">
         <label className="relative block">
-     <ImeTextInput
-  type="text"
-  value={query}
-  onChange={(event) => setQuery(event.currentTarget.value)}
-  onFocus={(event) => {
-    event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }}
-  placeholder="タイトル、人、感想で検索"
-  className="h-11 touch-manipulation rounded-lg border-2 border-foreground/10 bg-white pl-9 text-base shadow-none md:text-sm"
-  inputMode="search"
-  enterKeyHint="search"
-  aria-label="作品・ユーザーを検索"
-  autoComplete="off"
-  autoCorrect="off"
-  spellCheck={false}
-/>     <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-     
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <ImeTextInput
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+            onFocus={(event) => {
+              event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
+            }}
+            placeholder="タイトル、人、感想で検索"
+            className="h-11 touch-manipulation rounded-lg border-2 border-foreground/10 bg-white pl-9 text-base shadow-none md:text-sm"
+            inputMode="search"
+            enterKeyHint="search"
+            aria-label="作品・ユーザーを検索"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+          />
         </label>
         <div className="mt-3 flex flex-wrap gap-2">
           {TABS.map((entry) => {
