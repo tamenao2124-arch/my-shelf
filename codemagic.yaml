@@ -38,12 +38,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-      publishing:
-  app_store_connect:
-    apple_id: 6819624738
-    api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-    key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-    issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        apple_id: 6819624738
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
